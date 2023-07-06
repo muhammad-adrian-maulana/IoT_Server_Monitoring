@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        background-color: #e8e8e8;
+        margin-top: 5vh;
+      }
+
+      #cardHolder {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        background-color: #e8e8e8;
+        margin-top: 5vh;
+      }
+
+      @media (max-width: 900px) {
+        #cardHolder {
+          margin-top: 0;
+          margin-bottom: 30px;
+          flex-direction: column;
+        }
+      }
+
+      h1 {
+        font-size: 3rem;
+      }
+      p {
+        font-size: 1.5rem;
+      }
+      .units {
+        font-size: 1.2rem;
+      }
+      .dht-labels {
+        font-size: 1.5rem;
+      }
+      .card {
+        flex: 30%;
+        width: 400px;
+        height: 600px;
+        background: #f5f5f5;
+        padding: 2rem 1.5rem;
+        transition: box-shadow 0.3s ease, transform 0.2s ease;
+        margin: 10px;
+      }
+
+      .card-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        margin-bottom: 30px;
+      }
+
+      .card-avatar {
+        --size: 60px;
+        background: linear-gradient(to top, #f1e1c1 0%, #fcbc97 100%);
+        width: var(--size);
+        height: var(--size);
+        border-radius: 50%;
+        transition: transform 0.2s ease;
+        margin-bottom: 1rem;
+      }
+
+      .card-social {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .card-social__item {
+        list-style: none;
+        text-align: center;
+        margin-left: 20px;
+        margin-right: 20px;
+        margin-bottom: 30px;
+        color: #333;
+        font-size: 1.5em;
+        font-weight: 600;
+        line-height: 2rem;
+      }
+
+      .card-title {
+        color: #333;
+        font-size: 1.5em;
+        font-weight: 600;
+        line-height: 2rem;
+      }
+
+      .card-subtitle {
+        color: #859ba8;
+        font-size: 0.8em;
+      }
+
+      .card:hover {
+        box-shadow: 0 8px 50px #23232333;
+      }
+
+      .card:hover .card-info {
+        transform: translateY(-5%);
+      }
+
+      .card-avatar:hover {
+        transform: scale(1.1);
+      }
+
+      .intervalControl {
+        color: #333;
+        font-size: 1.5em;
+        font-weight: 600;
+        line-height: 2rem;
+      }
+    </style>
+    <title>UMN Server Room Monitoring</title>
+  </head>
+  <body>
+    <form onsubmit="return false;" class="intervalControl" style="flex: 100%; text-align: center">
+      <label for="apiInterval">Refresh Interval : </label>
+      <input onchange="changeInterval()" type="number" id="apiInterval" name="apiInterval" min="1" max="300" value="60" />
+      <button onclick="getData()" type="button">Refresh Now</button>
+    </form>
+    <div id="cardHolder"></div>
+  </body>
+  <script>
+    let apiInterval = 300000;
+
+    function changeInterval() {
+      apiInterval = document.getElementById("apiInterval").value * 1000;
+      setInterval(getData, apiInterval);
+    }
+
+    function getData() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.status == 200) {
+          console.log(this.responseText);
+          const obj = JSON.parse(this.responseText);
+          console.log(obj);
+
+          document.getElementById("cardHolder").innerHTML = obj
+            .map(
+              (data, index) =>
+                `<div class="card">
+      <div class="card-info">
+        <div class="card-avatar"></div>
+        <div class="card-title">UMN Server ${index + 1}</div>
+        <div class="card-subtitle">MyUMN Database</div>
+      </div>
+      <ul class="card-social">
+        <li class="card-social__item">
+          <p>
+            <i class="fas fa-thermometer-half fa-2x" style="color: #059e8a"></i>
+            <br />
+            <span id="temperature${index + 1}">!value!</span>
+            <span class="units">&deg;C</span>
+          </p>
+        </li>
+        <li class="card-social__item">
+          <p>
+            <i class="fas fa-tint fa-2x" style="color: #00add6"></i>
+            <br />
+            <span id="humidity${index + 1}">!value!</span>
+            <span class="units">&percnt;</span>
+          </p>
+        </li>
+      </ul>
+      <ul class="card-social">
+        <li class="card-social__item">
+          <p>
+            <i class="fa-2x" style="color: #515967">&#9729;&#65039;</i>
+            <br />
+            <span id="sensorGas${index + 1}">!value!</span>
+          </p>
+        </li>
+      </ul>
+      <ul class="card-social">
+        <li class="card-social__item">
+          <p>
+            <i class="fa-2x" style="color: #059e8a">&#128293;</i>
+            <br />
+            <span id="sensorFire${index + 1}">!value!</span>
+          </p>
+        </li>
+      </ul>
+      <ul class="card-social">
+        <li class="card-social__item">
+          <p>
+            <i class="fa-2x" style="color: #059e8a">&#128682;</i>
+            <br />
+            <span id="door${index + 1}">!value!</span>
+          </p>
+        </li>
+      </ul>
+    </div>`
+            )
+            .join("");
+
+          obj.map((data, index) => {
+            if (data.suhu > 24) {
+              document.getElementById(`temperature${index + 1}`).innerHTML = `<span style="color: rgb(255,0,0)">${data.suhu}</span>`;
+            } else {
+              document.getElementById(`temperature${index + 1}`).innerHTML = data.suhu;
+            }
+            document.getElementById(`humidity${index + 1}`).innerHTML = data.humidity;
+            if (data.smoke == 1.0) {
+              document.getElementById(`sensorGas${index + 1}`).innerHTML = "Normal";
+            } else {
+              document.getElementById(`sensorGas${index + 1}`).innerHTML = `<span style="color: rgb(255,0,0)">Asap Terdeteksi</span>`;
+            }
+            if (data.fire == false) {
+              document.getElementById(`sensorFire${index + 1}`).innerHTML = "Normal";
+            } else {
+              document.getElementById(`sensorFire${index + 1}`).innerHTML = `<span style="color: rgb(255,0,0)">Api Terdeteksi</span>`;
+            }
+            if (data.doorsensor == false) {
+              document.getElementById(`door${index + 1}`).innerHTML = "Pintu Tertutup";
+            } else {
+              document.getElementById(`door${index + 1}`).innerHTML = `<span style="color: rgb(255,0,0)">Pintu Terbuka</span>`;
+            }
+          });
+        }
+      };
+      xhttp.open("GET", "https://simple-iot-dashboard.vercel.app/sensordata", true);
+      xhttp.send();
+    }
+
+    setInterval(getData, apiInterval);
+
+    window.onload = function () {
+      getData();
+    };
+  </script>
+</html>
