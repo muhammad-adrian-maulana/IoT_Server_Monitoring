@@ -159,9 +159,9 @@
               (data, index) =>
                 `<div class="card">
       <div class="card-info">
-        <div class="card-avatar"></div>
-        <div class="card-title">UMN Server ${index + 1}</div>
-        <div class="card-subtitle">MyUMN Database</div>
+        <img src="logo bulet umn.png" alt="logo UMN" style="width: 70px; height: auto;">
+        <div class="card-title">UMN Server ${index + 1} building C</div>
+        <div class="card-subtitle">Environment Monitoring System</div>
       </div>
       <ul class="card-social">
         <li class="card-social__item">
@@ -213,12 +213,15 @@
             .join("");
 
           obj.map((data, index) => {
-            if (data.suhu > 24) {
+            if (data.suhu > 23 || data.suhu < 18) {
               document.getElementById(`temperature${index + 1}`).innerHTML = `<span style="color: rgb(255,0,0)">${data.suhu}</span>`;
             } else {
               document.getElementById(`temperature${index + 1}`).innerHTML = data.suhu;
-            }
+            if (data.humidity > 60 || data.humidity < 45) { 
+              document.getElementById(`humidity${index + 1}`).innerHTML = `<span style="color: rgb(255,0,0)">${data.humidity}</span>`; 
+            } else{
             document.getElementById(`humidity${index + 1}`).innerHTML = data.humidity;
+            }
             if (data.smoke == 1.0) {
               document.getElementById(`sensorGas${index + 1}`).innerHTML = "Normal";
             } else {
@@ -234,7 +237,7 @@
             } else {
               document.getElementById(`door${index + 1}`).innerHTML = `<span style="color: rgb(255,0,0)">Pintu Terbuka</span>`;
             }
-          });
+          }});
         }
       };
       xhttp.open("GET", "https://iot-server-monitoring.vercel.app/sensordata", true);
